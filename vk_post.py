@@ -53,8 +53,9 @@ def get_owner_id_and_photo_id(token, group_id, server, hash, photo):
     }
     response = requests.post(f'{url_vk_api}{method}', data=params)
     response.raise_for_status()
-    owner_id = response.json()['response'][0]['owner_id']
-    photo_id = response.json()['response'][0]['id']
+    response = response.json()
+    owner_id = response['response'][0]['owner_id']
+    photo_id = response['response'][0]['id']
 
     return owner_id, photo_id
 
@@ -66,7 +67,7 @@ def wall_post(token, message, owner_id, photo_id, group_id):
     params = {
         'access_token': token,
         'v': 5.131,
-        'owner_id': -group_id,
+        'owner_id': -int(group_id),
         'from_group': 1,
         'message': message,
         'attachments': f'photo{owner_id}_{photo_id}'
@@ -80,38 +81,38 @@ if __name__ == '__main__':
     load_dotenv()
     group_id = os.environ['GROUP_ID']
     token = os.environ['VK_TOKEN']
-    
+
     url = 'https://xkcd.com/info.0.json'
-    response = get_response(url)
-    number = response.json()['num']
-    message = response.json()['alt']
+    response = get_response(url).json()
+    number = response['num']
+    message = response['alt']
     random_num = random.randint(1, number)
     random_kom_url = f'https://xkcd.com/{random_num}/info.0.json'
 
-    response = get_response(random_kom_url)
+    response = get_response(random_kom_url).json()
 
     Path("images").mkdir(parents=True, exist_ok=True)
-    file_format = get_file_extension(response.json()['img'])
-    save_img(response.json()['img'], {}, f"komiks_{random_num}{file_format}")
+    file_format = get_file_extension(response['img'])
+    save_img(response['img'], {}, f"komiks_{random_num}{file_format}")
 
     url_vk_api = 'https://api.vk.com/method/'
 
     with open(f'images/komiks_{random_num}{file_format}', 'rb') as file:
-        url = get_upload_url(url_vk_api, token, group_id)
+        url = get_upload_url(token, group_id)
         files = {
             'photo': file, 
         }
         response = requests.post(url, files=files)
-        response.raise_for_status()
 
-    server = response.json()['server']
-    hash = response.json()['hash']
-    photo = response.json()['photo']
+    response.raise_for_status()
+    response = response.json()
+    server = response['server']
+    hash = response['hash']
+    photo = response['photo']
 
-    owner_id, photo_id = get_owner_id_and_photo_id(
-        url_vk_api, token, group_id, server, hash, photo)
+    owner_id, photo_id = get_owner_id_and_photo_id(token, group_id, server, hash, photo)
 
-    wall_post(url_vk_api, token, message, owner_id, photo_id, group_id)
+    wall_post(token, message, owner_id, photo_id, group_id)
 
     os.remove(f'images/komiks_{random_num}.png')
 
