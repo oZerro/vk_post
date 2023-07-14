@@ -22,12 +22,6 @@ def get_file_extension(path):
     return file_extension
 
 
-def get_response(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    return response
-
-
 def get_upload_url(token, group_id):
     vk_api_url = 'https://api.vk.com/method/'
     params = {
@@ -84,13 +78,17 @@ if __name__ == '__main__':
     token = os.environ['VK_TOKEN']
 
     url = 'https://xkcd.com/info.0.json'
-    response = get_response(url).json()
+    response = requests.get(url)
+    response.raise_for_status()
+    response = response.json()
     number = response['num']
     message = response['alt']
     random_num = random.randint(1, number)
     random_comic_url = f'https://xkcd.com/{random_num}/info.0.json'
 
-    response = get_response(random_comic_url).json()
+    response = requests.get(random_comic_url)
+    response.raise_for_status()
+    response = response.json()
     try:
         Path("images").mkdir(parents=True, exist_ok=True)
         file_format = get_file_extension(response['img'])
