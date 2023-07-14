@@ -87,9 +87,9 @@ if __name__ == '__main__':
     number = response['num']
     message = response['alt']
     random_num = random.randint(1, number)
-    random_kom_url = f'https://xkcd.com/{random_num}/info.0.json'
+    random_comic_url = f'https://xkcd.com/{random_num}/info.0.json'
 
-    response = get_response(random_kom_url).json()
+    response = get_response(random_comic_url).json()
 
     Path("images").mkdir(parents=True, exist_ok=True)
     file_format = get_file_extension(response['img'])
