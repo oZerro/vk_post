@@ -26,8 +26,7 @@ def check_response_vk_api(response):
     response = response.json()
     if 'error' in response:
         print('error_code', response['error']['error_code'])
-        print('error_msg', response['error']['error_msg'])
-        raise HTTPError
+        raise HTTPError('error_msg', response['error']['error_msg'])
 
 
 def get_upload_url(token, group_id):
@@ -133,7 +132,7 @@ if __name__ == '__main__':
         owner_id, photo_id = save_wall_photo(token, group_id, server, vk_hash, photo)
 
         make_wall_post(token, message, owner_id, photo_id, group_id)
-    except Exception as ex:
+    except HTTPError as ex:
         print(ex)
     finally:
         os.remove(photo_path)
