@@ -75,7 +75,7 @@ def wall_post(url_vk_api, token, message, owner_id, photo_id, group_id):
 
 if __name__ == '__main__':
     load_dotenv()
-    token = os.environ['ACCES_TOKEN']
+    token = os.environ['VK_TOKEN']
     url = 'https://xkcd.com/info.0.json'
     response = get_response(url)
     number = response.json()['num']
