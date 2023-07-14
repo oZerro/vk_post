@@ -61,7 +61,7 @@ def get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo):
     return owner_id, photo_id
 
 
-def wall_post(token, message, owner_id, photo_id, group_id):
+def make_wall_post(token, message, owner_id, photo_id, group_id):
     vk_api_url = 'https://api.vk.com/method/'
     method = 'wall.post'
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
         owner_id, photo_id = get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo)
 
-        wall_post(token, message, owner_id, photo_id, group_id)
+        make_wall_post(token, message, owner_id, photo_id, group_id)
     except Exception as ex:
         print(ex)
     finally:
