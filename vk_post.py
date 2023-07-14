@@ -27,7 +27,8 @@ def get_response(url):
     return response
 
 
-def get_upload_url(url_vk_api, token, group_id):
+def get_upload_url(token, group_id):
+    url_vk_api = 'https://api.vk.com/method/'
     params = {
         'access_token': token,
         'v': 5.131,
@@ -39,7 +40,8 @@ def get_upload_url(url_vk_api, token, group_id):
     return response.json()['response']['upload_url']
 
 
-def get_owner_id_and_photo_id(url_vk_api, token, group_id, server, hash, photo):
+def get_owner_id_and_photo_id(token, group_id, server, hash, photo):
+    url_vk_api = 'https://api.vk.com/method/'
     method = 'photos.saveWallPhoto'
     params = {
         'access_token': token,
@@ -57,7 +59,8 @@ def get_owner_id_and_photo_id(url_vk_api, token, group_id, server, hash, photo):
     return owner_id, photo_id
 
 
-def wall_post(url_vk_api, token, message, owner_id, photo_id, group_id):
+def wall_post(token, message, owner_id, photo_id, group_id):
+    url_vk_api = 'https://api.vk.com/method/'
     method = 'wall.post'
 
     params = {
@@ -75,7 +78,9 @@ def wall_post(url_vk_api, token, message, owner_id, photo_id, group_id):
 
 if __name__ == '__main__':
     load_dotenv()
+    group_id = os.environ['GROUP_ID']
     token = os.environ['VK_TOKEN']
+    
     url = 'https://xkcd.com/info.0.json'
     response = get_response(url)
     number = response.json()['num']
@@ -90,7 +95,6 @@ if __name__ == '__main__':
     save_img(response.json()['img'], {}, f"komiks_{random_num}{file_format}")
 
     url_vk_api = 'https://api.vk.com/method/'
-    group_id = 167658562
 
     with open(f'images/komiks_{random_num}{file_format}', 'rb') as file:
         url = get_upload_url(url_vk_api, token, group_id)
