@@ -28,20 +28,20 @@ def get_response(url):
 
 
 def get_upload_url(token, group_id):
-    url_vk_api = 'https://api.vk.com/method/'
+    vk_api_url = 'https://api.vk.com/method/'
     params = {
         'access_token': token,
         'v': 5.131,
         'group_id': group_id
     }
     method = 'photos.getWallUploadServer'
-    response = requests.get(f'{url_vk_api}{method}', params=params)
+    response = requests.get(f'{vk_api_url}{method}', params=params)
     response.raise_for_status()
     return response.json()['response']['upload_url']
 
 
 def get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo):
-    url_vk_api = 'https://api.vk.com/method/'
+    vk_api_url = 'https://api.vk.com/method/'
     method = 'photos.saveWallPhoto'
     params = {
         'access_token': token,
@@ -51,7 +51,7 @@ def get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo):
         'hash': vk_hash,
         'photo': photo
     }
-    response = requests.post(f'{url_vk_api}{method}', data=params)
+    response = requests.post(f'{vk_api_url}{method}', data=params)
     response.raise_for_status()
     response = response.json()
     owner_id = response['response'][0]['owner_id']
@@ -61,7 +61,7 @@ def get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo):
 
 
 def wall_post(token, message, owner_id, photo_id, group_id):
-    url_vk_api = 'https://api.vk.com/method/'
+    vk_api_url = 'https://api.vk.com/method/'
     method = 'wall.post'
 
     params = {
@@ -73,7 +73,7 @@ def wall_post(token, message, owner_id, photo_id, group_id):
         'attachments': f'photo{owner_id}_{photo_id}'
     }
 
-    response = requests.post(f'{url_vk_api}{method}', data=params)
+    response = requests.post(f'{vk_api_url}{method}', data=params)
     response.raise_for_status()
 
 
@@ -94,8 +94,6 @@ if __name__ == '__main__':
     Path("images").mkdir(parents=True, exist_ok=True)
     file_format = get_file_extension(response['img'])
     save_img(response['img'], {}, f"comic_{random_num}{file_format}")
-
-    url_vk_api = 'https://api.vk.com/method/'
 
     with open(f'images/komiks_{random_num}{file_format}', 'rb') as file:
         url = get_upload_url(token, group_id)
