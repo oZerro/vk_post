@@ -71,15 +71,12 @@ def make_wall_post(token, message, owner_id, photo_id, group_id):
     response.raise_for_status()
 
 
-if __name__ == '__main__':
-    load_dotenv()
-    group_id = os.environ['GROUP_ID']
-    token = os.environ['VK_TOKEN']
-
+def save_random_comic():
     url = 'https://xkcd.com/info.0.json'
     response = requests.get(url)
     response.raise_for_status()
     response = response.json()
+
     number = response['num']
     message = response['alt']
     random_num = random.randint(1, number)
@@ -87,32 +84,46 @@ if __name__ == '__main__':
 
     response = requests.get(random_comic_url)
     response.raise_for_status()
-    response = response.json()
-    try:
-        Path("images").mkdir(parents=True, exist_ok=True)
-        file_format = get_file_extension(response['img'])
-        save_img(response['img'], {}, f"comic_{random_num}{file_format}")
+    comic_img = response.json()['img']
 
-        with open(f'images/comic_{random_num}{file_format}', 'rb') as file:
+    Path("images").mkdir(parents=True, exist_ok=True)
+    file_format = get_file_extension(comic_img)
+    save_img(comic_img, {}, f"comic_{random_num}{file_format}")
+
+    return random_num, file_format, message
+
+
+def upload_photo_vk_server(random_comic_num, file_format):
+    with open(f'images/comic_{random_comic_num}{file_format}', 'rb') as file:
             url = get_upload_url(token, group_id)
             files = {
                 'photo': file, 
             }
             response = requests.post(url, files=files)
 
-        response.raise_for_status()
-        response = response.json()
-        server = response['server']
-        vk_hash = response['hash']
-        photo = response['photo']
+    response.raise_for_status()
+    response = response.json()
+    server = response['server']
+    vk_hash = response['hash']
+    photo = response['photo']
 
+    return server, vk_hash, photo
+
+
+if __name__ == '__main__':
+    load_dotenv()
+    group_id = os.environ['GROUP_ID']
+    token = os.environ['VK_TOKEN']
+    try:
+        random_comic_num, file_format, message = save_random_comic()
+        server, vk_hash, photo = upload_photo_vk_server(random_comic_num, file_format)
         owner_id, photo_id = save_wall_photo(token, group_id, server, vk_hash, photo)
 
         make_wall_post(token, message, owner_id, photo_id, group_id)
     except Exception as ex:
         print(ex)
     finally:
-        os.remove(f'images/comic_{random_num}.png')
+        os.remove(f'images/comic_{random_comic_num}{file_format}')
 
 
 
