@@ -1,7 +1,6 @@
 import requests
 import os
 import random
-import time
 from urllib.parse import urlparse
 from os.path import split, splitext
 from pathlib import Path
@@ -35,7 +34,7 @@ def get_upload_url(token, group_id):
     return response.json()['response']['upload_url']
 
 
-def get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo):
+def save_wall_photo(token, group_id, server, vk_hash, photo):
     vk_api_url = 'https://api.vk.com/method/'
     method = 'photos.saveWallPhoto'
     params = {
@@ -94,7 +93,7 @@ if __name__ == '__main__':
         file_format = get_file_extension(response['img'])
         save_img(response['img'], {}, f"comic_{random_num}{file_format}")
 
-        with open(f'images/komiks_{random_num}{file_format}', 'rb') as file:
+        with open(f'images/comic_{random_num}{file_format}', 'rb') as file:
             url = get_upload_url(token, group_id)
             files = {
                 'photo': file, 
@@ -107,7 +106,7 @@ if __name__ == '__main__':
         vk_hash = response['hash']
         photo = response['photo']
 
-        owner_id, photo_id = get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo)
+        owner_id, photo_id = save_wall_photo(token, group_id, server, vk_hash, photo)
 
         make_wall_post(token, message, owner_id, photo_id, group_id)
     except Exception as ex:
