@@ -40,7 +40,7 @@ def get_upload_url(token, group_id):
     return response.json()['response']['upload_url']
 
 
-def get_owner_id_and_photo_id(token, group_id, server, hash, photo):
+def get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo):
     url_vk_api = 'https://api.vk.com/method/'
     method = 'photos.saveWallPhoto'
     params = {
@@ -48,7 +48,7 @@ def get_owner_id_and_photo_id(token, group_id, server, hash, photo):
         'v': 5.131,
         'group_id': group_id,
         'server': server,
-        'hash': hash,
+        'hash': vk_hash,
         'photo': photo
     }
     response = requests.post(f'{url_vk_api}{method}', data=params)
@@ -107,10 +107,10 @@ if __name__ == '__main__':
     response.raise_for_status()
     response = response.json()
     server = response['server']
-    hash = response['hash']
+    vk_hash = response['hash']
     photo = response['photo']
 
-    owner_id, photo_id = get_owner_id_and_photo_id(token, group_id, server, hash, photo)
+    owner_id, photo_id = get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo)
 
     wall_post(token, message, owner_id, photo_id, group_id)
 
