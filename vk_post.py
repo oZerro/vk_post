@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
     Path("images").mkdir(parents=True, exist_ok=True)
     file_format = get_file_extension(response['img'])
-    save_img(response['img'], {}, f"komiks_{random_num}{file_format}")
+    save_img(response['img'], {}, f"comic_{random_num}{file_format}")
 
     url_vk_api = 'https://api.vk.com/method/'
 
