@@ -1,6 +1,7 @@
 import requests
 import os
 import random
+import time
 from urllib.parse import urlparse
 from os.path import split, splitext
 from pathlib import Path
@@ -90,29 +91,31 @@ if __name__ == '__main__':
     random_comic_url = f'https://xkcd.com/{random_num}/info.0.json'
 
     response = get_response(random_comic_url).json()
+    try:
+        Path("images").mkdir(parents=True, exist_ok=True)
+        file_format = get_file_extension(response['img'])
+        save_img(response['img'], {}, f"comic_{random_num}{file_format}")
 
-    Path("images").mkdir(parents=True, exist_ok=True)
-    file_format = get_file_extension(response['img'])
-    save_img(response['img'], {}, f"comic_{random_num}{file_format}")
+        with open(f'images/komiks_{random_num}{file_format}', 'rb') as file:
+            url = get_upload_url(token, group_id)
+            files = {
+                'photo': file, 
+            }
+            response = requests.post(url, files=files)
 
-    with open(f'images/komiks_{random_num}{file_format}', 'rb') as file:
-        url = get_upload_url(token, group_id)
-        files = {
-            'photo': file, 
-        }
-        response = requests.post(url, files=files)
+        response.raise_for_status()
+        response = response.json()
+        server = response['server']
+        vk_hash = response['hash']
+        photo = response['photo']
 
-    response.raise_for_status()
-    response = response.json()
-    server = response['server']
-    vk_hash = response['hash']
-    photo = response['photo']
+        owner_id, photo_id = get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo)
 
-    owner_id, photo_id = get_owner_id_and_photo_id(token, group_id, server, vk_hash, photo)
-
-    wall_post(token, message, owner_id, photo_id, group_id)
-
-    os.remove(f'images/komiks_{random_num}.png')
+        wall_post(token, message, owner_id, photo_id, group_id)
+    except Exception as ex:
+        print(ex)
+    finally:
+        os.remove(f'images/comic_{random_num}.png')
 
 
 
