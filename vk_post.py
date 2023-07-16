@@ -25,8 +25,8 @@ def get_file_extension(path):
 def check_response_vk_api(response):
     response = response.json()
     if 'error' in response:
-        print('error_code', response['error']['error_code'])
-        raise HTTPError('error_msg', response['error']['error_msg'])
+        raise HTTPError(f"error_msg - {response['error']['error_msg']}\n"
+                        f"error_code - {response['error']['error_code']}")
 
 
 def get_upload_url(token, group_id):
